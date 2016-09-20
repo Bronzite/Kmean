@@ -6,11 +6,10 @@ namespace KMean
     static public class KMean
     {
 
-        public static double[,] GetMeans(double[,] dNodes, int k)
+        public static double[,] GetMeans(double[,] dNodes, int k, double convergence)
         {
+            if (convergence == 0) throw new Exception("Convergence cannot be zero.");
             if (dNodes.Length == 0) return null;
-
-
 
             double[] dFirstNode = new double[dNodes.GetLength(1)];
             double[] dMaxValue = new double[dFirstNode.Length];
@@ -42,12 +41,27 @@ namespace KMean
                 }
             }
 
-            for(int i=0;i<2;i++)
+            double dTotalDifference = double.MaxValue;
+            while (dTotalDifference > convergence * convergence)
             {
                 double[,] newMeans = RecomputeMeans(dMeans, dNodes);
-                //TODO: Check Convergence
+                double dNodeDifference = 0;
+                dTotalDifference = 0;
+
+                for (int i = 0; i < k; i++)
+                {
+                    for (int j = 0; j < dNodes.GetLength(1); j++)
+                    {
+                        dNodeDifference += (dMeans[i, j] - newMeans[i, j]) * (dMeans[i, j] - newMeans[i, j]);
+                    }
+                    dTotalDifference += Math.Sqrt(dNodeDifference);
+                    
+
+                }
+                
                 dMeans = newMeans;
             }
+            
 
             return dMeans;
         }
